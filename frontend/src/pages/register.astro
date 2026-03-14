@@ -1,0 +1,65 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Register">
+  <h1>Register</h1>
+  <form id="register-form">
+    <div>
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required />
+    </div>
+    <div>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+    </div>
+    <div>
+      <label for="firstname">First Name</label>
+      <input type="text" id="firstname" name="firstname" required />
+    </div>
+    <div>
+      <label for="lastname">Last Name</label>
+      <input type="text" id="lastname" name="lastname" required />
+    </div>
+    <button type="submit">Register</button>
+    <p class="error" id="error-msg"></p>
+  </form>
+  <a href="/login">Already have an account? Login</a>
+</Layout>
+
+<script>
+  const form = document.getElementById("register-form") as HTMLFormElement;
+  const errorMsg = document.getElementById("error-msg") as HTMLParagraphElement;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorMsg.textContent = "";
+
+    const formData = new FormData(form);
+    const body = {
+      username: formData.get("username"),
+      password: formData.get("password"),
+      firstname: formData.get("firstname"),
+      lastname: formData.get("lastname"),
+    };
+
+    try {
+      const res = await fetch("http://localhost:4500/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        window.location.href = "/login";
+      } else {
+        errorMsg.textContent = data.message || "Registration failed";
+      }
+    } catch {
+      errorMsg.textContent = "Server error. Please try again.";
+    }
+  });
+</script>
